@@ -1,13 +1,12 @@
-var exec = require('child_process').exec;
-var querystring = require('querystring');
+var querystring = require('querystring'),
+    fs = require('fs');
 
 function start(res, postData) {
     console.log('Request handler "start" was called');
 
     var body = '<html>' +
         '<head>' +
-        '<meta http-equiv="Content-Type" content="text/html; ' +
-        'charset=UTF-8" />' +
+        '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' +
         '</head>' +
         '<body>' +
         '<form action="/upload" method="post">' +
@@ -35,5 +34,21 @@ function upload(res, postData) {
     res.end();
 }
 
+function show(res, postData) {
+    console.log('Request handler "show" was called.');
+    fs.readFile('./temp/test.png', "binary", function(error, file) {
+        if (error) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.write(error + '\n');
+            res.end();
+        } else {
+            res.writeHead(200, { 'Content-Type': 'image/png' });
+            res.write(file, "binary");
+            res.end();
+        }
+    });
+}
+
 exports.start = start;
 exports.upload = upload;
+exports.show = show;
