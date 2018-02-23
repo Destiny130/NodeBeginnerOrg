@@ -1,6 +1,7 @@
 var exec = require('child_process').exec;
+var querystring = require('querystring');
 
-function start(res) {
+function start(res, postData) {
     console.log('Request handler "start" was called');
 
     var body = '<html>' +
@@ -11,6 +12,7 @@ function start(res) {
         '<body>' +
         '<form action="/upload" method="post">' +
         '<textarea name="text" rows="20" cols="60"></textarea>' +
+        // '<textarea name="text" rows="20" cols="60"></textarea>' +
         '<input type="submit" value="Submit text" />' +
         '</form>' +
         '</body>' +
@@ -19,19 +21,6 @@ function start(res) {
     res.write(body);
     res.end();
 
-    // exec('find /', { timeout: 10000, maxBuffer: 20000 * 1024 },
-    //     function(error, stdout, stderr) {
-    //         res.writeHead(200, { 'Content-Type': 'text/plain' });
-    //         res.write(stdout);
-    //         res.end();
-    //     });
-
-    // exec('ls -lah', function(error, stdout, stderr) {
-    //     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    //     res.write(stdout);
-    //     res.end();
-    // });
-
     // function sleep(milliSeconds) {
     //     var startTime = new Date().getTime();
     //     while (new Date().getTime() < startTime + milliSeconds);
@@ -39,10 +28,10 @@ function start(res) {
     // sleep(10000);
 }
 
-function upload(res) {
+function upload(res, postData) {
     console.log('Request handler "upload" was called');
     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.write('Hello Upload');
+    res.write('You\'ve sent the text: ' + querystring.parse(postData).text);
     res.end();
 }
 
