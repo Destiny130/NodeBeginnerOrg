@@ -1,7 +1,8 @@
 var querystring = require('querystring'),
-    fs = require('fs');
+    fs = require('fs'),
+    formidable = require('formidable');
 
-function start(res, postData) {
+function start(res) {
     console.log('Request handler "start" was called');
 
     var body = '<html>' +
@@ -9,10 +10,9 @@ function start(res, postData) {
         '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' +
         '</head>' +
         '<body>' +
-        '<form action="/upload" method="post">' +
-        '<textarea name="text" rows="20" cols="60"></textarea>' +
-        // '<textarea name="text" rows="20" cols="60"></textarea>' +
-        '<input type="submit" value="Submit text" />' +
+        '<form action="/upload" enctype="multipart/form-data" method="post">' +
+        '<input type="file" name="upload">' +
+        '<input type="submit" value="Upload file" />' +
         '</form>' +
         '</body>' +
         '</html>';
@@ -27,14 +27,23 @@ function start(res, postData) {
     // sleep(10000);
 }
 
-function upload(res, postData) {
+function upload(res, req) {
     console.log('Request handler "upload" was called');
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.write('You\'ve sent the text: ' + querystring.parse(postData).text);
-    res.end();
+
+    var form = new formidable.IncomingForm();
+    form.uploadDir = 'temp';
+    console.log('about to parse');
+    form.parse(req, function(error, fields, files) {
+        console.log('parsing done');
+        fs.renameSync(files.upload.path, './temp/test2.png');
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.write('received image:<br/>');
+        res.write('<img src="/show" />');
+        res.end();
+    });
 }
 
-function show(res, postData) {
+function show(res) {
     console.log('Request handler "show" was called.');
     fs.readFile('./temp/test.png', "binary", function(error, file) {
         if (error) {
